@@ -21,26 +21,24 @@ system_uptime() {
 
 disk_usage() {
 
-    top5bysize=$(df -h | (sed -u 1q; sort -r -k 5) | head -n 6 | column -t)
-    echo -e "Disk Usage Top 5 by Size: \n"$top5bysize
-
+    echo -e "Disk Usage Top 5 by Size: \n"
+    df -h | (sed -u 1q; sort -r -k 5) | head -n 6 | column -t
 }
 
 memory_usage() {
 
-    usedMemory=$(free -h | awk 'NR==1 || NR ==2{print $2}')
-    echo -e "Memory Used: "$usedMemory
+    echo -e "Memory Used: \n"
+    free -h | awk 'NR==1 || NR ==2{print $2}'
 
 }
+
 
 cpu_consuming_process() {
 
-    cpu_process=$(ps aux --sort=-%cpu | head -n 6)
-    echo -e "Top 5 CPU consuming process: \n"$cpu_process
+    echo -e "Top 5 CPU consuming process: \n" 
+    ps -eo pid,user,comm,%cpu,%mem --sort=-%cpu | head -n 6
 
 }
-
-
 
 main() {
 
