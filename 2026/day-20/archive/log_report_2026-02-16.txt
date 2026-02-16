@@ -1,0 +1,67 @@
+==============================================
+           LOG ANALYSIS REPORT
+==============================================
+
+1. DATE OF ANALYSIS    : 2026-02-16
+2. LOG FILE NAME       : sample.log
+3. TOTAL LINES         : 200
+4. TOTAL ERROR COUNT   : 40
+
+==============================================
+      TOP 5 ERROR MESSAGES (by occurrence)    
+==============================================
+
+     10 Disk full
+      9 Failed to connect
+      8 Out of memory
+      7 Segmentation fault
+      6 Invalid input
+
+==============================================
+  LIST OF CRITICAL EVENETS WITH LINE NUMBER   
+==============================================
+
+Line 6:2026-02-16 17:27:09 [CRITICAL] Primary database down - 1165
+Line 18:2026-02-16 17:27:10 [CRITICAL] Primary database down - 14343
+Line 33:2026-02-16 17:27:11 [CRITICAL] All upstream services unreachable - 3910
+Line 38:2026-02-16 17:27:12 [CRITICAL] Message broker cluster down - 19255
+Line 46:2026-02-16 17:27:13 [CRITICAL] All upstream services unreachable - 18764
+Line 47:2026-02-16 17:27:13 [CRITICAL] Encryption key compromised - 9360
+Line 48:2026-02-16 17:27:13 [CRITICAL] Message broker cluster down - 10116
+Line 53:2026-02-16 17:27:13 [CRITICAL] Encryption key compromised - 15038
+Line 55:2026-02-16 17:27:13 [CRITICAL] Encryption key compromised - 11272
+Line 56:2026-02-16 17:27:13 [CRITICAL] Primary database down - 7605
+Line 57:2026-02-16 17:27:14 [CRITICAL] Encryption key compromised - 19542
+Line 60:2026-02-16 17:27:14 [CRITICAL] Message broker cluster down - 4061
+Line 62:2026-02-16 17:27:14 [CRITICAL] Encryption key compromised - 15729
+Line 66:2026-02-16 17:27:14 [CRITICAL] Message broker cluster down - 12667
+Line 73:2026-02-16 17:27:15 [CRITICAL] Encryption key compromised - 11312
+Line 75:2026-02-16 17:27:15 [CRITICAL] Primary database down - 16045
+Line 77:2026-02-16 17:27:15 [CRITICAL] Encryption key compromised - 1716
+Line 80:2026-02-16 17:27:16 [CRITICAL] Primary database down - 4740
+Line 82:2026-02-16 17:27:16 [CRITICAL] Message broker cluster down - 14483
+Line 83:2026-02-16 17:27:16 [CRITICAL] Primary database down - 2409
+Line 89:2026-02-16 17:27:16 [CRITICAL] All upstream services unreachable - 4475
+Line 95:2026-02-16 17:27:17 [CRITICAL] Primary database down - 5729
+Line 112:2026-02-16 17:27:19 [CRITICAL] Encryption key compromised - 5569
+Line 117:2026-02-16 17:27:19 [CRITICAL] Message broker cluster down - 22378
+Line 124:2026-02-16 17:27:20 [CRITICAL] All upstream services unreachable - 10156
+Line 126:2026-02-16 17:27:20 [CRITICAL] Encryption key compromised - 25280
+Line 132:2026-02-16 17:27:20 [CRITICAL] Primary database down - 15643
+Line 135:2026-02-16 17:27:21 [CRITICAL] Message broker cluster down - 21262
+Line 140:2026-02-16 17:27:21 [CRITICAL] Primary database down - 24847
+Line 148:2026-02-16 17:27:22 [CRITICAL] Primary database down - 1466
+Line 151:2026-02-16 17:27:22 [CRITICAL] Encryption key compromised - 12827
+Line 152:2026-02-16 17:27:22 [CRITICAL] Primary database down - 14404
+Line 161:2026-02-16 17:27:23 [CRITICAL] Primary database down - 2187
+Line 164:2026-02-16 17:27:23 [CRITICAL] All upstream services unreachable - 10368
+Line 170:2026-02-16 17:27:24 [CRITICAL] Primary database down - 17133
+Line 171:2026-02-16 17:27:24 [CRITICAL] All upstream services unreachable - 21164
+Line 174:2026-02-16 17:27:24 [CRITICAL] Encryption key compromised - 4031
+Line 176:2026-02-16 17:27:24 [CRITICAL] Encryption key compromised - 11453
+Line 178:2026-02-16 17:27:25 [CRITICAL] Message broker cluster down - 24059
+Line 183:2026-02-16 17:27:25 [CRITICAL] Encryption key compromised - 21386
+Line 187:2026-02-16 17:27:25 [CRITICAL] Primary database down - 410
+Line 192:2026-02-16 17:27:26 [CRITICAL] Message broker cluster down - 858
+
+==============================================

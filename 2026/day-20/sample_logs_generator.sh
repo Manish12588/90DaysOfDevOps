@@ -20,6 +20,10 @@ log_levels=("INFO" "DEBUG" "ERROR" "WARNING" "CRITICAL")
 
 # List of possible error messages
 error_messages=("Failed to connect" "Disk full" "Segmentation fault" "Invalid input" "Out of memory")
+info_message=("Server started successfully" "Connection established" "Request processed" "Scheduled job started" "Scheduled job completed")
+debug_message=("Variable state dumped" "Cache miss for key" "Query executed in 42ms" "Entering function process_request")
+warning_message=("High memory usage detected" "Response time exceeded threshold" "Retrying connection" "Rate limit approaching")
+critical_message=("Primary database down" "Message broker cluster down" "Encryption key compromised" "All upstream services unreachable")
 
 # Function to generate a random log line
 generate_log_line() {
@@ -27,6 +31,16 @@ generate_log_line() {
     local error_msg=""
     if [ "$log_level" == "ERROR" ]; then
         error_msg="${error_messages[$((RANDOM % ${#error_messages[@]}))]}"
+    elif [ "$log_level" == "INFO" ]; then
+        error_msg="${info_message[$((RANDOM % ${#info_message[@]}))]}"
+    elif [ "$log_level" == "DEBUG" ]; then
+        error_msg="${debug_message[$((RANDOM % ${#debug_message[@]}))]}"
+    elif [ "$log_level" == "WARNING" ]; then
+        error_msg="${warning_message[$((RANDOM % ${#warning_message[@]}))]}"
+    elif [ "$log_level" == "CRITICAL" ]; then
+        error_msg="${critical_message[$((RANDOM % ${#critical_message[@]}))]}"
+    else
+        echo "Undefined log level"
     fi
     echo "$(date '+%Y-%m-%d %H:%M:%S') [$log_level] $error_msg - $RANDOM"
 }
