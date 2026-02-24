@@ -1,0 +1,7 @@
+docker systerm prune 
+
+1. all stopped container 
+2. all  network not used by at least one container
+3. all dangling images
+4. unused build cache 
+
