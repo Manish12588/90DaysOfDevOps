@@ -1,0 +1,18 @@
+name: Nested Objects
+
+on:
+  push:
+    branches:
+      - main
+
+server:
+  - name: ubuntu
+  - ip: 172.0.0.0
+  - port: 80
+
+database:
+  - host: datbase.com
+  - name: mysql
+  - credentials:
+     user: root
+     password: password
