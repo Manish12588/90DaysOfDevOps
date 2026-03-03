@@ -21,7 +21,7 @@ Create a `docker-compose.yml` for a 3-service stack:
 - A **database** (Postgres or MySQL)
 - A **cache** (Redis)
   
-[docker_practice_app](https://github.com/Manish12588/docker-projects/tree/main/docker_practice_app)
+[docker-practice-app](https://github.com/Manish12588/docker-projects/tree/main/docker-practice-app)
 
 Write a simple Dockerfile for the web app. The app doesn't need to be complex — even a "Hello World" that connects to the database is enough.
 
@@ -29,16 +29,42 @@ Write a simple Dockerfile for the web app. The app doesn't need to be complex �
 
 ### Task 2: depends_on & Healthchecks
 1. Add `depends_on` to your compose file so the app starts **after** the database
+   
+    - Depends_on added in docker compose file.
+    
+    ![](Images/Task-2_Step-1.png)
+
 2. Add a **healthcheck** on the database service
+   
+     - Healthcheck added for mysql server
+  
+     ![](Images/Task-2_Step-2.png)
+    
 3. Use `depends_on` with `condition: service_healthy` so the app waits for the database to be truly ready, not just started
 
-**Test:** Bring everything down and up — does the app wait for the DB?
+        docker compose up -d
+    
+     ![](Images/Task-2_Step-3.png)
+
+**Test:** Bring everything down and up — does the app wait for the DB? 
+
+    Yes it wait for the server to be healty.
+
+[docker-practice-app](https://github.com/Manish12588/docker-projects/tree/main/docker-practice-app)
 
 ---
 
 ### Task 3: Restart Policies
 1. Add `restart: always` to your database service
+   
+        Added restart:always tag to mysql service
+    
 2. Manually kill the database container — does it come back?
+   
+        docker exec <container-id> kill 1
+
+    ![](Images/Task-3_Step-2.png)
+        
 3. Try `restart: on-failure` — how is it different?
 4. Write in your notes: When would you use each restart policy?
 
@@ -55,6 +81,7 @@ Write a simple Dockerfile for the web app. The app doesn't need to be complex �
 1. Define **explicit networks** in your compose file instead of relying on the default
 2. Define **named volumes** for database data
 3. Add **labels** to your services for better organization
+
 
 ---
 
