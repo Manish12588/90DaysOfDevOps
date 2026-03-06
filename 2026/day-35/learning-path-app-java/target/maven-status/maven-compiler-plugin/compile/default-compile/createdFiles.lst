@@ -1,0 +1,5 @@
+com\learningpath\LearningPathApplication.class
+com\learningpath\service\LearningPathService.class
+com\learningpath\model\LearningPath.class
+com\learningpath\controller\LearningPathController.class
+com\learningpath\model\LearningPath$Phase.class

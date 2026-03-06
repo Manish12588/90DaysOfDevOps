@@ -57,6 +57,8 @@ In `server.yaml`, add a `startup_script` field using:
 1. The `|` block style (preserves newlines)
 2. The `>` fold style (folds into one line)
 
+[Server_task-4](./YAML/server_task-4.yml)
+
 Write in your notes: When would you use `|` vs `>`?
 Pipe Symbol: It's best for code snippet.
 Greater-than sign: Ideally use for long paragraphs.
@@ -73,6 +75,8 @@ Greater-than sign: Ideally use for long paragraphs.
 
 ### Task 6: Spot the Difference
 Read both blocks and write what's wrong with the second one:
+
+In block 2 wrong identation
 
 ```yaml
 # Block 1 - correct

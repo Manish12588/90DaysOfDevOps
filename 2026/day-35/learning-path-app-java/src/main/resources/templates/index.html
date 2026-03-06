@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Path Explorer</title>
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0f0f1a;
+            --surface: #1a1a2e;
+            --surface2: #16213e;
+            --border: rgba(255,255,255,0.08);
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --radius: 16px;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+            padding: 2.5rem 2rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(99,102,241,0.25) 0%, transparent 70%);
+        }
+
+        header h1 {
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #a5b4fc, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        header p {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-size: 1.05rem;
+            position: relative;
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: sticky;
+            top: 2rem;
+        }
+
+        .sidebar h2 {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            padding-left: 0.5rem;
+        }
+
+        .path-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .path-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1rem 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            user-select: none;
+        }
+
+        .path-card:hover {
+            transform: translateX(4px);
+            border-color: rgba(255,255,255,0.15);
+            background: var(--surface2);
+        }
+
+        .path-card.active {
+            border-color: var(--card-color, #6366f1);
+            background: rgba(99, 102, 241, 0.08);
+            box-shadow: 0 0 0 1px var(--card-color, #6366f1), inset 0 0 20px rgba(99, 102, 241, 0.05);
+        }
+
+        .path-icon {
+            font-size: 1.8rem;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+
+        .path-info h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .path-info p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+
+        /* ===== ROADMAP AREA ===== */
+        .roadmap-area {
+            min-height: 500px;
+        }
+
+        .welcome-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 500px;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .welcome-state .big-icon {
+            font-size: 5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .welcome-state h2 {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .welcome-state p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        /* ===== ROADMAP HEADER ===== */
+        .roadmap-header {
+            display: none;
+            align-items: center;
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem 2rem;
+            border-radius: var(--radius);
+            background: var(--surface);
+            border: 1px solid var(--border);
+        }
+
+        .roadmap-header.visible {
+            display: flex;
+        }
+
+        .roadmap-header .header-icon {
+            font-size: 2.5rem;
+        }
+
+        .roadmap-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .roadmap-header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 3px;
+        }
+
+        .badge {
+            margin-left: auto;
+            padding: 0.35rem 0.85rem;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.07);
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* ===== PHASES ===== */
+        .phases-container {
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .phases-container.visible {
+            display: flex;
+        }
+
+        .phase-item {
+            display: flex;
+            gap: 1.5rem;
+            animation: slideIn 0.4s ease forwards;
+            opacity: 0;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Connector line */
+        .phase-connector {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .phase-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            border: 2px solid;
+            background: var(--bg);
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .phase-line {
+            width: 2px;
+            flex: 1;
+            min-height: 20px;
+            margin: 4px 0;
+        }
+
+        .phase-item:last-child .phase-line {
+            display: none;
+        }
+
+        /* Phase card */
+        .phase-card {
+            flex: 1;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .phase-card:hover {
+            border-color: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .phase-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .phase-card-header h3 {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .duration-badge {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.25rem 0.7rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.06);
+            color: var(--text-muted);
+        }
+
+        .topics-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .topic-chip {
+            font-size: 0.78rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .topic-chip:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--text);
+        }
+
+        /* ===== PROGRESS BAR ===== */
+        .progress-section {
+            display: none;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .progress-section.visible {
+            display: block;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .progress-bar-track {
+            height: 8px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 999px;
+            width: 0%;
+            transition: width 1s ease 0.5s;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🚀 Learning Path Explorer</h1>
+    <p>Select a career path and visualize your complete learning roadmap</p>
+</header>
+
+<div class="container">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar">
+        <h2>Choose Your Path</h2>
+        <div class="path-cards" id="pathCards">
+            <div th:each="path : ${paths}"
+                 class="path-card"
+                 th:data-id="${path.id}"
+                 th:style="'--card-color:' + ${path.color}"
+                 onclick="selectPath(this.dataset.id)">
+                <div class="path-icon" th:text="${path.icon}">🧪</div>
+                <div class="path-info">
+                    <h3 th:text="${path.title}">Path Title</h3>
+                    <p th:text="${path.description}">Description</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ===== ROADMAP AREA ===== -->
+    <main class="roadmap-area">
+
+        <!-- Welcome State -->
+        <div class="welcome-state" id="welcomeState">
+            <div class="big-icon">🗺️</div>
+            <h2>Your roadmap awaits</h2>
+            <p>Select a learning path from the left to see your complete journey</p>
+        </div>
+
+        <!-- Roadmap Header -->
+        <div class="roadmap-header" id="roadmapHeader">
+            <div class="header-icon" id="headerIcon"></div>
+            <div>
+                <h2 id="headerTitle"></h2>
+                <p id="headerDesc"></p>
+            </div>
+            <span class="badge" id="headerPhaseCount"></span>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="progress-section" id="progressSection">
+            <div class="progress-header">
+                <span>Estimated Total Duration</span>
+                <span id="totalDuration"></span>
+            </div>
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <!-- Phases Container -->
+        <div class="phases-container" id="phasesContainer"></div>
+
+    </main>
+</div>
+
+<!-- ===== DATA FROM SERVER (hidden JSON) ===== -->
+<script id="pathsJson" type="application/json" th:utext="${pathsJson}"></script>
+
+<script>
+    // Fallback: fetch from API if inline data failed
+    let pathsData = {};
+
+    function init() {
+        try {
+            const jsonEl = document.getElementById('pathsJson');
+            if (jsonEl && jsonEl.textContent.trim()) {
+                const arr = JSON.parse(jsonEl.textContent);
+                arr.forEach(p => { pathsData[p.id] = p; });
+                return;
+            }
+        } catch(e) { console.warn('JSON parse failed, falling back to API', e); }
+
+        // Fetch from REST API
+        fetch('/api/paths')
+            .then(r => r.json())
+            .then(data => { data.forEach(p => { pathsData[p.id] = p; }); });
+    }
+
+    function selectPath(id) {
+        // Update active card
+        document.querySelectorAll('.path-card').forEach(c => c.classList.remove('active'));
+        const card = document.querySelector(`.path-card[data-id="${id}"]`);
+        if (card) card.classList.add('active');
+
+        const path = pathsData[id];
+        if (!path) {
+            // Fetch if not available
+            fetch(`/api/paths/${id}`)
+                .then(r => r.json())
+                .then(p => renderPath(p));
+            return;
+        }
+        renderPath(path);
+    }
+
+    function renderPath(path) {
+        // Hide welcome, show roadmap
+        document.getElementById('welcomeState').style.display = 'none';
+
+        // Update header
+        const header = document.getElementById('roadmapHeader');
+        header.className = 'roadmap-header visible';
+        header.style.borderColor = path.color + '55';
+        header.style.boxShadow = `0 0 40px ${path.color}15`;
+        document.getElementById('headerIcon').textContent = path.icon;
+        document.getElementById('headerTitle').textContent = path.title;
+        document.getElementById('headerDesc').textContent = path.description;
+        document.getElementById('headerPhaseCount').textContent = `${path.phases.length} Phases`;
+
+        // Progress section
+        const progressSection = document.getElementById('progressSection');
+        progressSection.className = 'progress-section visible';
+        // Calculate total weeks
+        let totalWeeks = 0;
+        path.phases.forEach(p => {
+            const match = p.duration.match(/\d+/);
+            if (match) totalWeeks += parseInt(match[0]);
+        });
+        document.getElementById('totalDuration').textContent = `~${totalWeeks} weeks`;
+        // Animate progress bar to show overall completeness estimation
+        const fill = document.getElementById('progressFill');
+        fill.style.background = `linear-gradient(90deg, ${path.color}, ${path.color}88)`;
+        fill.style.width = '0%';
+        setTimeout(() => { fill.style.width = '100%'; }, 100);
+
+        // Render phases
+        const container = document.getElementById('phasesContainer');
+        container.innerHTML = '';
+        container.className = 'phases-container visible';
+
+        path.phases.forEach((phase, i) => {
+            const item = document.createElement('div');
+            item.className = 'phase-item';
+            item.style.animationDelay = `${i * 0.1}s`;
+
+            const topicsHtml = phase.topics.map(t =>
+                `<span class="topic-chip" style="border-color:${path.color}33">${t}</span>`
+            ).join('');
+
+            item.innerHTML = `
+                <div class="phase-connector">
+                    <div class="phase-dot" style="color:${path.color};border-color:${path.color};box-shadow:0 0 12px ${path.color}44">
+                        ${i + 1}
+                    </div>
+                    <div class="phase-line" style="background:linear-gradient(to bottom,${path.color}88,${path.color}11)"></div>
+                </div>
+                <div class="phase-card" style="border-top:2px solid ${path.color}55">
+                    <div class="phase-card-header">
+                        <h3>${phase.name}</h3>
+                        <span class="duration-badge">⏱ ${phase.duration}</span>
+                    </div>
+                    <div class="topics-grid">${topicsHtml}</div>
+                </div>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    // Init on load
+    window.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>

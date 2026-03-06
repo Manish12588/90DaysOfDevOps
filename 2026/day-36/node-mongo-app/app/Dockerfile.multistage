@@ -1,0 +1,26 @@
+#Stage 1: Install Dependency
+FROM node:20-slim AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+
+#RUN npm install
+RUN npm install --production
+
+COPY . .
+
+#Stage 2: 
+#FROM node:20-slim AS runner
+FROM gcr.io/distroless/nodejs20-debian12
+
+WORKDIR /app 
+
+# Copy node_modules from builder
+#COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app .
+
+EXPOSE 3000
+
+CMD ["index.js"]
+
