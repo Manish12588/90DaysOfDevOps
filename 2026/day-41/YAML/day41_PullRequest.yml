@@ -1,0 +1,13 @@
+name: Trigger on pull request
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  pullRequest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: PR check running for branch
+        run: echo "PR check running for branch:" ${{ github.head_ref }}

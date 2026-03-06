@@ -1,0 +1,25 @@
+name: Matrix Build Strategy with OS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  python-os-matrix:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      max-parallel: 3
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ['3.10','3.11','3.12']
+        exclude:
+          - os: windows-latest
+            python-version: '3.12'
+
+    steps:
+      - name: Installing Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Print Python Version
+        run: python --version

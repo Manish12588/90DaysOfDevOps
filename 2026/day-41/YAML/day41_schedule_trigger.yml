@@ -1,0 +1,17 @@
+name: Schedule Trigger
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+
+jobs:
+  information:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: print information
+        run: echo "Printing from Schedule Trigger github actions"
