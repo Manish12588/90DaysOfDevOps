@@ -1,0 +1,28 @@
+name: Challenge Task 4
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  greet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      - name: Print message
+        run: echo "Hello from github actions!"
+
+      - name: Print Current Date and Time
+        run: date
+
+      - name: Print branch name
+        run: echo "Branch Name:" ${{ github.ref_name }}
+
+      - name: List the file in repo
+        run: ls -la
+
+      - name: Print runner operating system
+        run: echo "Operating system:" $RUNNER_OS

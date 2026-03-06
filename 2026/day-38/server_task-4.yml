@@ -1,0 +1,26 @@
+name: Challenge Task 4
+
+on:
+  push:
+    branches: main
+    workflow_dispatch:
+
+jobs:
+  task-4.1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Block Style
+        startup_script:
+          run: |
+            sudo apt-get update
+            sudo apt install nginx
+            systemctl status nginx
+      
+  task-4.2:
+    runs-on: ubuntu-latest
+    steps:
+      name: Fold Style
+      startup_script: >
+        echo "This is fold style of multi string. " && \
+        echo "It's a second step of task 4"
+      
