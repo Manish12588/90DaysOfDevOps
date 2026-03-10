@@ -1,0 +1,44 @@
+name: Day 42 Task-1 | Github Hosted Runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ubuntu-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print information about ubuntu
+        run: |
+          echo "OS Name"
+          uname
+          echo "Runner Hostname"
+          hostname
+          echo "Current User"
+          whoami
+
+  windows-job:
+    runs-on: windows-latest
+    steps:
+      - name: Print information about Windows
+        run: |
+          echo "OS Name"
+          uname
+          echo "Runner Hostname"
+          hostname
+          echo "Current User"
+          whoami
+
+  macos-job:
+    runs-on: macos-latest
+
+    steps:
+      - name: Print information about macos
+        run: |
+          echo "OS Name"
+          uname
+          echo "Runner Hostname"
+          hostname
+          echo "Current User"
+          whoami
+    
+

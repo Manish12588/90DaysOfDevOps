@@ -1,0 +1,19 @@
+name: Day 42 Task-2 | what's Pre-installed
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ubuntu-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Information about the pre-installed software's
+        run: |
+          echo "Docker version"
+          docker --version
+          echo "Python version"
+          python --version
+          echo "Node version"
+          node --version
+          echo "Git Version"
+          git --version

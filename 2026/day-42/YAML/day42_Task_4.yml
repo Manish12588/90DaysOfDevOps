@@ -1,0 +1,19 @@
+name: Day 42 Task-4 | Self Hosted Runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ubuntu-job:
+    runs-on: self-hosted
+    steps:
+      - name: Information about the self hosted runner
+        run: |
+          echo "Host Name:"
+          hostname
+          echo "Print Working Directory:"
+          pwd
+          echo "Create a file"
+          touch task_4.txt
+          echo "Verify the files"
+          ls -lh task_4.txt
