@@ -1,0 +1,48 @@
+name: Day 43 Task-5 | Putting it together
+
+on:
+  push:
+    branches: [main, feature]
+
+jobs:
+  lint-job:
+    runs-on: self-hosted
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: setup python version 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+      
+      #- name: Installing dependencies
+      #  run: pip install -r requirement.txt
+      
+      - name: Install flake8
+        run: pip install flake8
+      
+      - name: Run Lint
+        run: flake8 .
+
+  test-job:
+    runs-on: self-hosted
+    steps:
+      - name: Run test
+        run: echo "Running Test..."
+
+  summary:
+    runs-on: self-hosted
+    needs: [lint-job, test-job]
+    steps:
+      - name: Print commit message
+        run: echo "Commit Message:" ${{github.event.commits[0].message}}
+      
+      - name: Branch Name
+        run: |
+          echo "Branch Name:" ${{github.ref_name}}
+          if [ "${{github.ref_name}}" == "main" ]; then
+            echo "This is MAIN Branch"
+          else
+            echo "This is FEATURE Branch"
+          fi

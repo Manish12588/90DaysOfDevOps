@@ -1,0 +1,54 @@
+name: Day 43 Task-4 | Conditionals
+
+on:
+  push:
+    branches: [main]
+
+  pull_request:
+    branches: [main]
+
+  workflow_dispatch:
+  
+jobs:
+  main_branch:
+    #runs-on: ubuntu-latest
+    runs-on: self-hosted
+    steps:
+      - name: run when push on main branch
+        if: github.ref == 'refs/heads/main'
+        run: |
+         echo "Run's when anything done on main branch"
+  
+  previous_step_failed:
+    #runs-on: ubuntu-latest
+    runs-on: self-hosted
+    steps:
+      - name: Failed step
+        run: |
+          echo "Failing this step"
+          exit 1
+
+      - name: Run on Previous Step Failed
+        if: failure()
+        run: echo "Steps executed because previous step got failed."
+
+
+  on_push_only:
+    if: github.event_name != 'pull_request'
+    #runs-on: ubuntu-latest
+    runs-on: self-hosted
+    steps:
+      - name: Run only on push events not on pull request
+        run: echo "on push events"
+
+  continue_on_error:
+    runs-on: self-hosted
+    steps:    
+      - name: Failed step
+        continue-on-error: true
+        run: |
+          echo "Failing step..."
+          exit 1
+
+      - name: Continue on error step
+        run: echo "Steps executed because continue-on-error was true."
