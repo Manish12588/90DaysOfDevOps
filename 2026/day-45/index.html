@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Docker CI/CD · GitHub Actions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background: #0e0f13;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Outfit', sans-serif;
+    padding: 2rem;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+  }
+
+  .card {
+    background: #16181f;
+    border: 1px solid #2a2d38;
+    border-radius: 20px;
+    padding: 2.5rem 2.5rem 2rem;
+    width: 100%;
+    max-width: 900px;
+    box-shadow: 0 0 0 1px #1e2029, 0 32px 80px rgba(0,0,0,0.6);
+    position: relative;
+    overflow: hidden;
+    animation: rise 0.6s cubic-bezier(.22,.68,0,1.2) both;
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(24px) scale(0.98); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 10%; right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #f59e0b, #fb923c, transparent);
+    border-radius: 0 0 4px 4px;
+  }
+
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #f59e0b;
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .label::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: #22c55e;
+    border-radius: 50%;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.2; }
+  }
+
+  h1 {
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    font-weight: 700;
+    color: #f1f2f6;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  h1 .accent { color: #f59e0b; }
+
+  .badge img {
+    height: 22px;
+    border-radius: 4px;
+    opacity: 0.85;
+    margin-top: 0.25rem;
+  }
+
+  /* ── Pipeline ── */
+  .pipeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 1.75rem;
+    /* Remove overflow-x: auto to prevent truncation */
+    width: 100%;
+  }
+
+  .stage {
+    flex: 1 1 0;
+    min-width: 0; /* Allow shrinking below content size */
+    background: #1d1f28;
+    border: 1px solid #2e3140;
+    border-radius: 14px;
+    padding: 1.1rem 0.5rem 0.9rem;
+    text-align: center;
+    cursor: default;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+    animation: stageFade 0.5s ease both;
+  }
+  .stage:nth-child(1) { animation-delay: 0.1s; }
+  .stage:nth-child(3) { animation-delay: 0.2s; }
+  .stage:nth-child(5) { animation-delay: 0.3s; }
+  .stage:nth-child(7) { animation-delay: 0.4s; }
+  @keyframes stageFade {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .stage:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .stage.checkout:hover { border-color: #3b82f6; box-shadow: 0 8px 24px rgba(59,130,246,0.15); }
+  .stage.build:hover    { border-color: #06b6d4; box-shadow: 0 8px 24px rgba(6,182,212,0.15); }
+  .stage.push:hover     { border-color: #f59e0b; box-shadow: 0 8px 24px rgba(245,158,11,0.15); }
+  .stage.pullrun:hover  { border-color: #22c55e; box-shadow: 0 8px 24px rgba(34,197,94,0.15); }
+
+  .stage-icon {
+    font-size: 1.75rem;
+    margin-bottom: 0.45rem;
+    display: block;
+    line-height: 1;
+  }
+
+  .stage-name {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #d1d5db;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+
+  .stage-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    color: #4b5363;
+    margin-top: 0.3rem;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .stage-num {
+    position: absolute;
+    top: -8px; right: -8px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    font-size: 0.6rem;
+    font-weight: 700;
+    font-family: 'IBM Plex Mono', monospace;
+    display: flex; align-items: center; justify-content: center;
+    color: #0e0f13;
+    border: 2px solid #16181f;
+    z-index: 1;
+  }
+  .checkout .stage-num { background: #3b82f6; }
+  .build    .stage-num { background: #06b6d4; }
+  .push     .stage-num { background: #f59e0b; }
+  .pullrun  .stage-num { background: #22c55e; }
+
+  /* arrows between stages */
+  .arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 28px;
+    position: relative;
+  }
+  .arrow::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 10px;
+    height: 1.5px;
+    background: #2e3140;
+  }
+  .arrow::after {
+    content: '';
+    position: absolute;
+    right: 6px;
+    width: 7px; height: 7px;
+    border-right: 1.5px solid #4b5363;
+    border-top: 1.5px solid #4b5363;
+    transform: rotate(45deg);
+  }
+  .arrow .dot {
+    position: absolute;
+    left: 0;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #f59e0b;
+    animation: travel 2s linear infinite;
+    z-index: 1;
+  }
+  .arrow:nth-child(2) .dot { animation-delay: 0s;    background: #3b82f6; }
+  .arrow:nth-child(4) .dot { animation-delay: 0.5s;  background: #06b6d4; }
+  .arrow:nth-child(6) .dot { animation-delay: 1s;    background: #f59e0b; }
+  @keyframes travel {
+    0%   { left: 0;    opacity: 0; }
+    15%  { opacity: 1; }
+    85%  { opacity: 1; }
+    100% { left: calc(100% - 6px); opacity: 0; }
+  }
+
+  /* ── Tech tags ── */
+  .tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding-top: 1.25rem;
+    border-top: 1px solid #1f2130;
+    align-items: center;
+  }
+
+  .tag-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    color: #4b5363;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-right: 0.25rem;
+  }
+
+  .tag {
+    background: #1d1f28;
+    border: 1px solid #2e3140;
+    color: #9ca3af;
+    padding: 0.3rem 0.75rem;
+    border-radius: 99px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: border-color 0.2s, color 0.2s;
+    cursor: default;
+  }
+  .tag:hover { border-color: #f59e0b; color: #f1f2f6; }
+
+  /* Responsive: stack vertically on small screens */
+  @media (max-width: 560px) {
+    .pipeline {
+      flex-direction: column;
+      gap: 0;
+    }
+    .stage {
+      width: 100%;
+      padding: 0.9rem 1rem;
+    }
+    .arrow {
+      width: 2px;
+      height: 28px;
+      flex-direction: column;
+    }
+    .arrow::before {
+      left: 50%;
+      right: auto;
+      top: 0;
+      bottom: 8px;
+      width: 1.5px;
+      height: auto;
+      transform: translateX(-50%);
+    }
+    .arrow::after {
+      right: auto;
+      bottom: 4px;
+      top: auto;
+      left: 50%;
+      transform: translateX(-50%) rotate(135deg);
+    }
+    .arrow .dot {
+      animation: travelV 2s linear infinite;
+    }
+    @keyframes travelV {
+      0%   { top: 0; left: 50%; opacity: 0; }
+      15%  { opacity: 1; }
+      85%  { opacity: 1; }
+      100% { top: calc(100% - 6px); left: 50%; opacity: 0; }
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="header">
+    <div class="title-group">
+      <div class="label">CI/CD Pipeline</div>
+      <h1>Docker + <span class="accent">GitHub Actions</span></h1>
+    </div>
+    <div class="badge">
+      <img
+        src="https://github.com/srdangat/github-actions-practice/actions/workflows/docker-publish.yml/badge.svg"
+        alt="Build Status"
+        onerror="this.style.display='none'"
+      />
+    </div>
+  </div>
+
+  <div class="pipeline">
+
+    <div class="stage checkout">
+      <span class="stage-num">1</span>
+      <span class="stage-icon">🔄</span>
+      <div class="stage-name">Code Checkout</div>
+      <div class="stage-sub">actions/checkout</div>
+    </div>
+
+    <div class="arrow"><div class="dot"></div></div>
+
+    <div class="stage build">
+      <span class="stage-num">2</span>
+      <span class="stage-icon">🐳</span>
+      <div class="stage-name">Docker Build</div>
+      <div class="stage-sub">docker build</div>
+    </div>
+
+    <div class="arrow"><div class="dot"></div></div>
+
+    <div class="stage push">
+      <span class="stage-num">3</span>
+      <span class="stage-icon">📤</span>
+      <div class="stage-name">Push to Hub</div>
+      <div class="stage-sub">docker push</div>
+    </div>
+
+    <div class="arrow"><div class="dot"></div></div>
+
+    <div class="stage pullrun">
+      <span class="stage-num">4</span>
+      <span class="stage-icon">🚀</span>
+      <div class="stage-name">Pull &amp; Run</div>
+      <div class="stage-sub">docker run</div>
+    </div>
+
+  </div>
+
+  <div class="tags">
+    <span class="tag-label">Stack</span>
+    <span class="tag">🐳 Docker</span>
+    <span class="tag">⚙️ GitHub Actions</span>
+    <span class="tag">🌐 Nginx</span>
+    <span class="tag">📦 Docker Hub</span>
+  </div>
+
+</div>
+
+</body>
+</html>
