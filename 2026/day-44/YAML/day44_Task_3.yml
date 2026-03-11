@@ -1,0 +1,20 @@
+name: Day 44 Task-3 | Upload Artifacts
+
+on:
+    workflow_dispatch:
+        
+jobs:
+    upload-artifacts:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Create a log file
+              run: |
+                mkdir -p log-directory
+                echo "INFO: Log created for Test" >> log-directory/log.txt
+
+            - name: upload artifects
+              uses: actions/upload-artifact@v4
+              with:
+                name: my-log-file
+                path: log-directory/log.txt
+

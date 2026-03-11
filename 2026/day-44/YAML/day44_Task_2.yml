@@ -1,0 +1,18 @@
+name: Day 44 Task-2 | Use Secrets as Environment Variables
+
+on:
+    workflow_dispatch:
+        
+jobs:
+    secrets-to-environment-variable:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Use created docker secrets
+              env:
+                DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
+                DOCKER_TOKEN: ${{secrets.DOCKER_TOKEN}}
+              run: |
+                echo "DockerHub User Name:"$DOCKER_USERNAME

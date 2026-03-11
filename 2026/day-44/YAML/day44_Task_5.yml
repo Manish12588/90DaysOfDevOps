@@ -1,0 +1,25 @@
+name: Day 44 Task-5 | Run Real Tests in CI
+
+on:
+    workflow_dispatch:
+        
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: setup python version 3.12
+              uses: actions/setup-python@v5
+              with:
+                python-version: 3.12
+            
+            - name: Install dependencies
+              run: pip install -r requirement.txt
+            
+            - name: Make system info script executable
+              run: chmod +x system-info.sh
+            
+            - name: Run script
+              run: ./system-info.sh
