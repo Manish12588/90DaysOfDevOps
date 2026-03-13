@@ -1,0 +1,44 @@
+name: Day-46 Task-5 | Create a Composite Action
+description: Greeting a user in their own language and prints environment info
+
+inputs:
+  name:
+    description: "Name whom to greet"
+    required: true
+
+  language:
+    description: "Language for greeting"
+    required: false
+    default: "en"
+
+outputs:
+  greeted:
+    description: "Print greetings"
+    value: ${{steps.set-output.outputs.greeted}}
+
+runs:
+ using: composite
+ steps:
+   - name: print greetings
+     shell: bash
+     run: |
+       case "${{ inputs.language }}" in
+          en) echo "Hello, ${{ inputs.name }}!" ;;
+          es) echo "Hola, ${{ inputs.name }}!" ;;
+          fr) echo "Bonjour, ${{ inputs.name }}!" ;;
+          de) echo "Hallo, ${{ inputs.name }}!" ;;
+          *)  echo "Hey, ${{ inputs.name }}! (unknown language: ${{ inputs.language }})" ;;
+        esac
+
+   - name: Print date and runner os
+     shell: bash
+     run: |
+       echo "Current date $(date)"
+       echo "Runner OS: ${{runner.os}}"
+       
+   - name: set greeted output
+     id: set-output
+     shell: bash
+     run: |
+       echo "greeted=true" >> $GITHUB_OUTPUT
+      

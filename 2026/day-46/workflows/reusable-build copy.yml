@@ -1,0 +1,51 @@
+name: Day-46 Task-2 | Create Your First Reusable Workflow
+
+on:
+    workflow_call:
+        inputs:
+            app_name:
+                description: "My App Name"
+                required: true
+                type: string
+
+            environment:
+                description: "My App Environment"
+                required: true
+                type: string
+                default: "staging"
+            
+        secrets:
+            docker_token:
+                required: true
+        
+        outputs:
+            build_version:
+                value: ${{jobs.task-2.outputs.build-version}}  # Level 3 — expose to caller
+
+                  
+jobs:
+    task-2:
+          runs-on: ubuntu-latest
+          outputs:
+            build-version: ${{steps.set-version.outputs.build_version}}  # Level 2 — expose to workflow
+          steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Print Build info
+              run: echo "Building ${{inputs.app_name}} for ${{inputs.environment}}"
+
+            - name: Docker token info
+              run: |
+                if [ -n "${{ secrets.docker_token }}" ]; then
+                    echo "Docker token is set: true"
+                else
+                    echo "Docker token is set: false"
+                fi
+            
+            - name: Generate version                # Level 1 — generate in step
+              id: set-version                       # id required to reference output
+              run: |
+               BUILD_VERSION="v1.0-${GITHUB_SHA::7}"
+               echo "build_version=$BUILD_VERSION" >> $GITHUB_OUTPUT
+               echo "Generated build version: $BUILD_VERSION"

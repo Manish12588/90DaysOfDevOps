@@ -1,0 +1,33 @@
+name: Greet Workflow
+
+on:
+    workflow_dispatch:
+      inputs:
+        name:
+            description: "Your name"
+            required: true
+            default: "Manish"
+        language:
+            description: "Language (en, es, fr, de)"
+            required: false
+            default: "en"
+
+jobs:
+    greet:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code    #required to access local composite action
+              uses: actions/checkout@v4
+
+            - name: Run and greet
+              id: greet
+              uses: ./.github/actions/setup-and-greet
+              with:
+                name: ${{inputs.name}}
+                language: ${{inputs.language}}
+            
+            - name: Verify output
+              run: |
+                echo "Greeted output: ${{ steps.greet.outputs.greeted }}"
+
+
