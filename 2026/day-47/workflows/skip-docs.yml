@@ -1,0 +1,21 @@
+name: Day-47 Task-4 | Skip Docs
+
+on:
+    push:
+        branches:
+          - main
+          - release/*
+
+        paths-ignore:
+          - '*.md'
+          - 'docs/**'
+
+jobs:
+    validate-md-change:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Validate changes in md or doc file
+              run: |
+                echo "Triggered By: " ${{github.event_name}}
+                echo "Branch: " ${{github.ref_name}}
+                echo "Code files changed — skipping docs and .md changes"

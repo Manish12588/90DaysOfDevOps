@@ -1,0 +1,14 @@
+name: Day-47 Task-6 | External Event Triggers
+
+on:
+    repository_dispatch:
+        types:
+            - deploy-request
+
+jobs:
+    print_payload:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Print environment name from payload
+              run: |
+                echo "Environment:  ${{github.event.client_payload.environment}}"

@@ -1,0 +1,26 @@
+name: Day-47 Task-4 | Path & Branch Filters
+
+on:
+    push:
+        branches:
+            - main
+            - release/*
+
+        paths:
+          - 'src/**'
+          - 'app/**'
+    
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Print Trigger Info
+              run: |
+                echo "Triggered By: " ${{github.event_name}}
+                echo "Branch: " ${{github.ref_name}}
+                echo "Commit: " ${{github.sha}}
+                echo "File changes in src/ or app/"
+        

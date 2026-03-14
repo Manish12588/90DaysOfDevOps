@@ -1,0 +1,74 @@
+name: Day-47 Task-2 | PR Validation Workflow
+
+on: 
+    pull_request:
+        branches:
+          - main
+        types: 
+          - opened
+          - reopened
+        
+jobs:
+    file-size-check:
+        name: This jobs check the file size in pull requests
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout the code
+              uses: actions/checkout@v4
+              with:
+                fetch-depth: 0
+            
+            #- name: Fails if any file in the PR is larger than 1 MB
+            #  id: size_check
+            #  uses: pelotech/github-action-file-size-checker@v0.1.2
+            #  with:
+            #    max_file_size_kib: '1024'
+
+            #- name: Fetch Main Branch
+            #  run: git fetch origin main
+
+            - name: Fails if any file in the PR is larger than 1 MB
+              run: |
+               BASE=${{github.event.pull_request.base.sha}}
+               HEAD=${{github.event.pull_request.head.sha}}
+               for file in $(git diff --name-only $BASE $HEAD); do
+                  if [ -f "$file" ]; then
+                    SIZE=$(stat -c%s "$file")
+                    SIZE_KB=$((SIZE / 1024))
+                    if [ $SIZE -gt 1048576 ]; then
+                      echo "❌ FAILED: $file is ${SIZE_KB}KB — exceeds 1MB limit"
+                      exit 1
+                    else
+                      echo "✅ OK: $file is ${SIZE_KB}KB"
+                    fi
+                  fi
+                done
+
+    branch-name-check:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Read the branch name
+              run: echo "Branch Name:" ${{github.head_ref}}
+
+            - name: Validate Branch Name pattern
+              run: |
+               if echo "${{ github.head_ref }}" | grep -qE "^(feature|fix|docs)/.+" ; then
+                 echo "Vaild Branch Name:" ${{github.head_ref}}
+               else 
+                 echo "Invalid Branch Name = ${{github.head_ref}}, use feature/*, fix/*, docs/*"
+                 exit 1
+               fi
+
+    pr-body-check:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Read the pr body
+              run: echo "PR Body:" ${{ github.event.pull_request.body }}
+            
+            - name: Warn if PR description is empty
+              run: |
+               if [ -z "${{github.event.pull_request.body}}" ]; then
+                 echo "WARNING: Please add a description of created pull request"
+               else
+                 echo "DESCRIPTION: " ${{github.event.pull_request.body}}
+               fi

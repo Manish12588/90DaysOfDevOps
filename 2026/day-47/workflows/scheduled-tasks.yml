@@ -1,0 +1,39 @@
+name: Day-47 Task-3 | Scheduled Workflows (Cron Deep Dive)
+
+on:
+  schedule:
+    - cron: '30 2 * * 1'
+    - cron: '0 */6 * * *'
+
+  workflow_dispatch:
+
+jobs:
+    scheduler-info:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Print scheduled trigger
+              run: |
+               echo "Triggered By Scheduler:" ${{github.event.schedule}}
+               if [ "${{ github.event.schedule }}" = "30 2 * * 1"  ]; then
+                 echo "Running weekly Monday job at 2:30 AM UTC"
+               elif [ "${{ github.event.schedule }}" = "0 */6 * * *" ]; then
+                 echo "Running every 6 hours job"
+               else
+                 echo "Triggered Manually via workflow_dispatch"
+               fi
+        
+            - name: Health check
+              run: |
+               URL="https://www.google.com"
+               echo "Running Health check on: $URL" 
+
+               RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" $URL)
+               echo "Response code: $RESPONSE_CODE"
+
+               if [ $RESPONSE_CODE -eq 200 ]; then
+                 echo "$URL is UP and RUNNING..."
+               else
+                 echo "FAIL: $URL return $RESPONSE_CODE"
+                 exit 1
+               fi
+               

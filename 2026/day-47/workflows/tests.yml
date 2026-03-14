@@ -1,0 +1,16 @@
+name: Day-47 Task-5 | Chain Work flow Together (Tests)
+
+on:
+    push:
+        branches:
+          - main
+
+jobs:
+    print-git-info:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Print commit information
+              run: |
+                echo "Triggered event: " ${{github.event_name}}
+                echo "Branch Name: " ${{github.ref_name}}
+                echo "Triggered by: " ${{github.triggering_actor}}

@@ -1,0 +1,24 @@
+name: Day-47 Task-5 | Deploy After test workflow
+
+on:
+    workflow_run:
+        workflows: ["Day-47 Task-5 | Chain Work flow Together (Tests)"]
+        types: [completed]
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        if: ${{github.event.workflow_run.conclusion == 'success'}}
+        steps:
+            - name: trigger deploy workflow after test
+              run: |
+                echo "Tests workflow executed successfully."
+
+    notify-failure:
+        runs-on: ubuntu-latest
+        if: ${{github.event.workflow_run.conclusion != 'success'}}
+        steps:
+            - name: Notify on failure
+              run: |
+               echo "WARNING: Tests jobs not executed successfully"
+               exit 1
