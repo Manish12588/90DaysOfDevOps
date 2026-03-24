@@ -1,0 +1,21 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: dynamic-pod
+spec:
+  containers:
+    - name: dynamic-pod
+      image: busybox:1.36
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          echo "Written dynamically at $(date)" >> /data/message.txt
+          cat /data/message.txt
+          sleep 3600
+      volumeMounts:
+        - name: dynamic-volume
+          mountPath: /data
+  volumes:
+    - name: dynamic-volume
+      persistentVolumeClaim:
+        claimName: dynamic-pvc
