@@ -1,0 +1,10 @@
+kind: ConfigMap
+apiVersion: v1
+
+metadata:
+  name: busybox-config-map
+
+data:
+  APP_ENV: production
+  APP_DEBUG: "false"
+  APP_PORT: "8080"
