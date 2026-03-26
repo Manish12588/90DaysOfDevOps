@@ -1,0 +1,33 @@
+kind: StatefulSet
+apiVersion: apps/v1
+
+metadata:
+  name: nginx-statefulset
+
+spec:
+  serviceName: nginx-headless-service
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:                  #Pod Templates
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:            #Container details inside pod
+        - name: web
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: data
+              mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 100Mi

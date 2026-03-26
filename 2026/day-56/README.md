@@ -22,12 +22,12 @@ Deployments work great for stateless apps, but what about databases? You need st
 
 This is fine for web servers but not for databases where you need stable identity.
 
-| Feature | Deployment | StatefulSet |
-|---|---|---|
-| Pod names | Random | Stable, ordered (`app-0`, `app-1`) |
-| Startup order | All at once | Ordered: pod-0, then pod-1, then pod-2 |
-| Storage | Shared PVC | Each pod gets its own PVC |
-| Network identity | No stable hostname | Stable DNS per pod |
+| Feature          | Deployment         | StatefulSet                            |
+| ---------------- | ------------------ | -------------------------------------- |
+| Pod names        | Random             | Stable, ordered (`app-0`, `app-1`)     |
+| Startup order    | All at once        | Ordered: pod-0, then pod-1, then pod-2 |
+| Storage          | Shared PVC         | Each pod gets its own PVC              |
+| Network identity | No stable hostname | Stable DNS per pod                     |
 
 Delete the Deployment before moving on.
 
