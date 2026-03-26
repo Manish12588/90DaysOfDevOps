@@ -1,0 +1,25 @@
+kind: Pod
+apiVersion: v1
+
+metadata:
+  name: liveness-probe-pod
+
+spec:
+  containers:
+    - name: busybox
+      image: busybox:latest
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          touch /tmp/healthy &&
+          echo "Created /tmp/healthy" &&
+          sleep 30 &&
+          rm -f /tmp/healthy &&
+          sleep 600
+
+      livenessProbe:
+        exec:
+          command: ["cat", "/tmp/healthy"]
+        #initialDelaySeconds: 5               # wait 5s before first probe
+        periodSeconds: 5                     # probe every 5 seconds
+        failureThreshold: 3                  # restart after 3 consecutive failures
