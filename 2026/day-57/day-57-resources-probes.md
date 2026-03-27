@@ -212,6 +212,26 @@ Delete all pods and services you created.
 
 ## NOTES ##
 
+**Requests vs limits (scheduling vs enforcement)**
+
+`Requests`
+ - Used by Kubernetes scheduler to decide where to place the Pod
+ - Guarantees minimum resources
+
+`Limits`
+ - Enforced by container runtime
+ - Prevents container from using more than defined resources
+
+
+**What happens when CPU or memory limits are exceeded**
+
+`CPU limit exceeded`
+- Container is throttled (slowed down, not killed)
+
+`Memory limit exceeded`
+- Container is killed (OOMKilled) and restarted
+
+
 | Probe     | When it runs                          | What it checks                             | On Failure                     | Restarts Container? |
 | --------- | ------------------------------------- | ------------------------------------------ | ------------------------------ | ------------------- |
 | Startup   | First — before liveness and readiness | Is the app done starting?                  | Restarts container             | Yes                 |
