@@ -1,0 +1,37 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+
+metadata:
+  name: php-apache-hpa
+
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: php-apache-server        # ✅ matches your deployment name
+
+  minReplicas: 1
+  maxReplicas: 10
+
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50   # scale up when CPU > 50% of requests (200m)
+
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0        # no waiting — scale up immediately
+      policies:
+        - type: Pods
+          value: 4                         # add up to 4 pods at a time
+          periodSeconds: 15               # every 15 seconds if still needed
+
+    scaleDown:
+      stabilizationWindowSeconds: 300      # wait 5 minutes before scaling down
+      policies:
+        - type: Pods
+          value: 1                         # remove only 1 pod at a time
+          periodSeconds: 60               # every 60 seconds
