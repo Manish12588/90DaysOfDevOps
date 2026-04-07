@@ -1,0 +1,58 @@
+- name: Playbook to install packages
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Install multiple packages
+      apt:
+        name:
+          - git
+          - curl
+          - wget
+          - tree
+        state: present
+        update_cache: true
+
+    - name: Ensure Nginx is running
+      service:
+        name: nginx
+        state: started
+        enabled: true
+      when: "'web' in group_names"
+
+    - name: Copy config file
+      copy:
+        src: files/app.conf
+        dest: /etc/app.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: create application directory
+      file:
+        path: /opt/myapp
+        state: directory
+        owner: ubuntu
+        mode: '0755'
+
+    - name: Check disk space
+      command: df -h
+      register: disk_output
+
+    - name: Print disk space
+      debug:
+        var: disk_output.stdout_lines
+
+    - name: count running process
+      shell: ps aux | wc -l
+      register: process_count
+
+    - name: Show process count
+      debug:
+        msg: "Total processes: {{ process_count.stdout }}"
+
+    - name: Set timezone in environment
+      lineinfile:
+        path: /etc/environment
+        line: 'TZ=Asia/Kolkata'
+        create: true
