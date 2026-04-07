@@ -340,6 +340,8 @@ Write `multi-play.yml` with separate plays for each server group:
         mode: '0700'
 ```
 
+**[multi-play.yml](./Task-6/multi-play.yml)**
+
 Run it:
 ```bash
 ansible-playbook multi-play.yml
