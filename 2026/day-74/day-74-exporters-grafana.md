@@ -231,16 +231,12 @@ Create a dashboard that shows the health of your system at a glance.
 - Title: "CPU Usage %"
 - Set thresholds: green < 60, yellow < 80, red >= 80
 
-![](Images/Task-4_Panel-1.png)
-
 **Panel 2 -- Memory Usage (Gauge):**
 ```promql
 (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100
 ```
 - Visualization: Gauge
 - Title: "Memory Usage %"
-
-![](Images/Task-4_Panel-2.png)
 
 **Panel 3 -- Container CPU Usage (Time Series):**
 ```promql
@@ -341,6 +337,8 @@ Explore the imported dashboard. It has dozens of panels covering CPU, memory, di
 
 **Try another one:** Import dashboard ID **193** (Docker monitoring via cAdvisor). Select Prometheus as the datasource and explore container-level stats.
 
+**For Docker Monitoring: 15798**
+
 ![](Images/Task-6_Step-3.png)
 
 **Your full `docker-compose.yml` should now have these services:**
@@ -354,6 +352,7 @@ Verify all are running:
 ```bash
 docker compose ps
 ```
+![](Images/Task-6_Step-4.png)
 
 ---
 
