@@ -5,7 +5,9 @@ Research and write short notes on:
 
 1. What is observability? How is it different from traditional monitoring?
    - **Monitoring** tells you _when_ something is wrong (alerts, thresholds)
+     - Monitoring is the practice of collecting predefined signals from a system and alerting when those signals cross known thresholds. Classic example: "CPU > 80% for 5 minutes → page the on-call." You set up a dashboard, you set up alerts, and you wait.
    - **Observability** tells you _why_ something is wrong (explore, query, correlate)
+     - Observability is the property of a system that lets you ask new questions of it — questions you didn't anticipate when you built the instrumentation. It's about being able to explore, slice, correlate, and drill down into a system's behavior from the outside, using the telemetry it emits.
 
 2. The three pillars of observability:
    - **Metrics** -- numerical measurements over time (CPU usage, request count, error rate). Tools: Prometheus, Datadog, CloudWatch
@@ -25,6 +27,14 @@ Research and write short notes on:
    [Host]     --> metrics --> [Node Exporter] --> [Prometheus]
    [Docker]   --> metrics --> [cAdvisor] --> [Prometheus]
    ```
+   ![](Images/Task-1_Step-4.png)
+
+   **How to read the diagram**
+   The stack has four vertical lanes — sources → collectors → storage → visualization — and three signal types flow across them:
+   - Metrics path (teal): Your Django app exposes a /metrics endpoint. Prometheus scrapes it on a schedule. Node Exporter and cAdvisor do the same for host-level and container-level metrics respectively. All three feed the Prometheus time-series database.
+   - Logs path (coral): Containers write to stdout/stderr, which Docker captures. Promtail discovers these log streams via docker_sd_configs (exactly what you configured in your stack) and ships them to Loki, which indexes by labels rather than full-text.
+   - Traces path (amber): The app's OpenTelemetry SDK emits spans to the OTEL Collector, which forwards them to a trace backend like Tempo (or Jaeger). This is also the path that caused your ALLOWED_HOSTS issue earlier — OTEL auto-instrumentation hooks request paths at a low level.
+   - Grafana queries all three backends through configured datasources (which you've been provisioning via YAML) and gives you a single UI to correlate across them.
 ---
 
 ### Task 2: Set Up Prometheus with Docker
@@ -112,6 +122,11 @@ prometheus_http_requests_total{handler="/api/v1/query"}
 ```
 
 **Document:** What is the difference between a counter and a gauge? Give one real-world example of each.
+- Both are Prometheus metric types, but they model fundamentally different kinds of measurement. Getting this distinction right matters because it directly affects which PromQL functions you can use on them.
+- Counter — Real-World Example
+  - http_requests_total — total number of HTTP requests the app has served since it started.
+- Gauge — Real-World Example
+  - node_memory_MemAvailable_bytes — bytes of memory currently available on the host.
 
 ---
 
@@ -124,11 +139,15 @@ up
 ```
 This returns 1 (up) or 0 (down) for each scrape target.
 
+![](Images/Task-4_Step-1.png)
+
 2. **Range vector** -- values over a time window:
 ```promql
 prometheus_http_requests_total[5m]
 ```
 Returns all values from the last 5 minutes.
+
+![](Images/Task-4_Step-2.png)
 
 3. **Rate** -- per-second rate of a counter over a time window:
 ```promql
@@ -136,16 +155,22 @@ rate(prometheus_http_requests_total[5m])
 ```
 This is the most common function you will use. Counters always go up -- `rate()` converts them to a useful per-second speed.
 
+![](Images/Task-4_Step-3.png)
+
 4. **Aggregation** -- sum across all label combinations:
 ```promql
 sum(rate(prometheus_http_requests_total[5m]))
 ```
+![](Images/Task-4_Step-4.png)
 
 5. **Filter by label:**
 ```promql
 prometheus_http_requests_total{code="200"}
 prometheus_http_requests_total{code!="200"}
 ```
+![](Images/Task-4_Step-5.png)
+
+![](Images/Task-4_Step-6.png)
 
 6. **Arithmetic:**
 ```promql
@@ -153,12 +178,20 @@ process_resident_memory_bytes / 1024 / 1024
 ```
 This converts bytes to megabytes.
 
+![](Images/Task-4_Step-7.png)
+
 7. **Top-K:**
 ```promql
 topk(5, prometheus_http_requests_total)
 ```
+![](Images/Task-4_Step-8.png)
 
 **Try this exercise:** Write a PromQL query that shows the per-second rate of non-200 HTTP requests to Prometheus over the last 5 minutes. (Hint: use `rate()` with a label filter on `code!="200"`)
+
+```bash
+rate(prometheus_http_requests_total{code!="200"}[5m])
+```
+![](Images/Task-4_Step-9.png)
 
 ---
 
@@ -179,16 +212,24 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     restart: unless-stopped
+    networks:
+      - monitoring
 
-  notes-app:
-    image: trainwithshubham/notes-app:latest
-    container_name: notes-app
+  my-notes-app:
+    image: manish12588/my-notes-app:latest
+    container_name: my-notes-app
     ports:
-      - "8000:8000"
+      - "5000:5000"
     restart: unless-stopped
+    networks:
+      - monitoring
 
 volumes:
   prometheus_data:
+
+networks:
+  monitoring:
+
 ```
 **[docker-compose.yml](./Task-5/docker-compose.yml)**
 
@@ -203,9 +244,9 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:9090"]
 
-  - job_name: "notes-app"
+  - job_name: "my-notes-app"
     static_configs:
-      - targets: ["notes-app:8000"]
+      - targets: ["my-notes-app:5000"]
 ```
 **[prometheus.yml](./Task-5/prometheus.yml)**
 
@@ -217,10 +258,11 @@ docker compose up -d
 
 Go back to Status > Targets. You should now see two targets. Generate some traffic to the app:
 ```bash
-curl http://localhost:8000
-curl http://localhost:8000
-curl http://localhost:8000
+curl http://localhost:5000
+curl http://localhost:5000
+curl http://localhost:5000
 ```
+![](Images/Task-5_Step-2.png)
 
 **Note:** Not all applications expose Prometheus metrics natively. In later days you will learn how Node Exporter, cAdvisor, and OTEL Collector act as metric exporters for systems that do not have built-in Prometheus support.
 
@@ -247,6 +289,10 @@ command:
 3. Check the TSDB status in the UI: Status > TSDB Status
 
 **Document:** What happens when retention is exceeded? Why is a volume mount important for Prometheus data?
+- Prometheus is a time-series database — it stores samples (value + timestamp) for every metric. Left unchecked, that database grows forever: every 15 seconds, every scrape target contributes new samples, compounding indefinitely. Retention is the policy that caps this growth by deleting old data on a schedule.
+
+**What Actually Happens When Retention Is Exceeded**
+- Prometheus organizes data on disk into blocks — immutable chunks covering a time window (2 hours by default, compacted into larger blocks over time: 2h → 2h → 2h, then into a single 6h block, then 1-day blocks, eventually 31-day blocks). Each block is a directory under /prometheus/ with a random ULID name.
 
 ---
 

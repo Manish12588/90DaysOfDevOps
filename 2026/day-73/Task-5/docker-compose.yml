@@ -10,13 +10,20 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     restart: unless-stopped
+    networks:
+      - monitoring
 
-  notes-app:
-    image: trainwithshubham/notes-app:latest
-    container_name: notes-app
+  my-notes-app:
+    image: manish12588/my-notes-app:latest
+    container_name: my-notes-app
     ports:
-      - "8000:8000"
+      - "5000:5000"
     restart: unless-stopped
+    networks:
+      - monitoring
 
 volumes:
   prometheus_data:
+
+networks:
+  monitoring:
