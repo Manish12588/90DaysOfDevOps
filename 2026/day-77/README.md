@@ -62,16 +62,16 @@ docker compose ps
 
 All 8 services should show as running:
 
-| Service | Port | Check |
-|---------|------|-------|
-| Prometheus | 9090 | `http://localhost:9090` |
-| Node Exporter | 9100 | `curl http://localhost:9100/metrics \| head -5` |
-| cAdvisor | 8080 | `http://localhost:8080` |
-| Grafana | 3000 | `http://localhost:3000` (admin/admin) |
-| Loki | 3100 | `curl http://localhost:3100/ready` |
-| Promtail | 9080 | Internal only |
-| OTEL Collector | 4317/4318 | `docker logs otel-collector` |
-| Notes App | 8000 | `http://localhost:8000` |
+| Service        | Port      | Check                                           |
+| -------------- | --------- | ----------------------------------------------- |
+| Prometheus     | 9090      | `http://localhost:9090`                         |
+| Node Exporter  | 9100      | `curl http://localhost:9100/metrics \| head -5` |
+| cAdvisor       | 8080      | `http://localhost:8080`                         |
+| Grafana        | 3000      | `http://localhost:3000` (admin/admin)           |
+| Loki           | 3100      | `curl http://localhost:3100/ready`              |
+| Promtail       | 9080      | Internal only                                   |
+| OTEL Collector | 4317/4318 | `docker logs otel-collector`                    |
+| Notes App      | 8000      | `http://localhost:8000`                         |
 
 ---
 
@@ -226,35 +226,35 @@ Go to Dashboards > New Dashboard. Add these panels:
 
 **Row 1 -- System Health (Node Exporter + Prometheus):**
 
-| Panel | Type | Query |
-|-------|------|-------|
-| CPU Usage | Gauge | `100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)` |
-| Memory Usage | Gauge | `(1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100` |
-| Disk Usage | Gauge | `(1 - node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100` |
-| Targets Up | Stat | `sum(up)` / `count(up)` |
+| Panel        | Type  | Query                                                                                                  |
+| ------------ | ----- | ------------------------------------------------------------------------------------------------------ |
+| CPU Usage    | Gauge | `100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)`                                     |
+| Memory Usage | Gauge | `(1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100`                              |
+| Disk Usage   | Gauge | `(1 - node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100` |
+| Targets Up   | Stat  | `sum(up)` / `count(up)`                                                                                |
 
 **Row 2 -- Container Metrics (cAdvisor):**
 
-| Panel | Type | Query |
-|-------|------|-------|
-| Container CPU | Time series | `rate(container_cpu_usage_seconds_total{name!=""}[5m]) * 100` (legend: `{{name}}`) |
-| Container Memory | Bar chart | `container_memory_usage_bytes{name!=""} / 1024 / 1024` (legend: `{{name}}`) |
-| Container Count | Stat | `count(container_last_seen{name!=""})` |
+| Panel            | Type        | Query                                                                              |
+| ---------------- | ----------- | ---------------------------------------------------------------------------------- |
+| Container CPU    | Time series | `rate(container_cpu_usage_seconds_total{name!=""}[5m]) * 100` (legend: `{{name}}`) |
+| Container Memory | Bar chart   | `container_memory_usage_bytes{name!=""} / 1024 / 1024` (legend: `{{name}}`)        |
+| Container Count  | Stat        | `count(container_last_seen{name!=""})`                                             |
 
 **Row 3 -- Application Logs (Loki):**
 
-| Panel | Type | Query (Loki datasource) |
-|-------|------|-------|
-| App Logs | Logs | `{container_name="notes-app"}` |
-| Error Rate | Time series | `sum(rate({job="docker"} \|= "error" [5m]))` |
+| Panel      | Type        | Query (Loki datasource)                              |
+| ---------- | ----------- | ---------------------------------------------------- |
+| App Logs   | Logs        | `{container_name="notes-app"}`                       |
+| Error Rate | Time series | `sum(rate({job="docker"} \|= "error" [5m]))`         |
 | Log Volume | Time series | `sum by (container_name) (rate({job="docker"}[5m]))` |
 
 **Row 4 -- Service Overview:**
 
-| Panel | Type | Query |
-|-------|------|-------|
+| Panel                      | Type        | Query                                                        |
+| -------------------------- | ----------- | ------------------------------------------------------------ |
 | Prometheus Scrape Duration | Time series | `prometheus_target_interval_length_seconds{quantile="0.99"}` |
-| OTEL Metrics Received | Stat | `otelcol_receiver_accepted_metric_points` (if available) |
+| OTEL Metrics Received      | Stat        | `otelcol_receiver_accepted_metric_points` (if available)     |
 
 Save the dashboard as "Production Overview -- Observability Stack".
 
@@ -265,26 +265,26 @@ Set the dashboard time range to "Last 30 minutes" and enable auto-refresh (every
 ### Task 6: Compare Your Stack with the Reference and Document
 Now compare what you built over days 73-76 with the reference repository.
 
-| Component | Your Version | Reference Repo | Differences |
-|-----------|-------------|----------------|-------------|
-| `prometheus.yml` | Day 73-74 | Root directory | Compare scrape jobs |
-| `loki-config.yml` | Day 75 | `loki/` directory | Compare storage config |
-| `promtail-config.yml` | Day 75 | `promtail/` directory | Compare scrape configs |
-| `otel-collector-config.yml` | Day 76 | `otel-collector/` directory | Compare pipelines |
-| `datasources.yml` | Day 74 | `grafana/provisioning/` | Compare provisioned sources |
-| `docker-compose.yml` | Days 73-76 | Root directory | Compare all 8 services |
+| Component                   | Your Version | Reference Repo              | Differences                 |
+| --------------------------- | ------------ | --------------------------- | --------------------------- |
+| `prometheus.yml`            | Day 73-74    | Root directory              | Compare scrape jobs         |
+| `loki-config.yml`           | Day 75       | `loki/` directory           | Compare storage config      |
+| `promtail-config.yml`       | Day 75       | `promtail/` directory       | Compare scrape configs      |
+| `otel-collector-config.yml` | Day 76       | `otel-collector/` directory | Compare pipelines           |
+| `datasources.yml`           | Day 74       | `grafana/provisioning/`     | Compare provisioned sources |
+| `docker-compose.yml`        | Days 73-76   | Root directory              | Compare all 8 services      |
 
 **Reflect and document:**
 
 1. Map each observability concept to the day you learned it:
 
-| Day | What You Built |
-|-----|---------------|
-| 73 | Prometheus, PromQL, metrics fundamentals |
-| 74 | Node Exporter, cAdvisor, Grafana dashboards |
-| 75 | Loki, Promtail, LogQL, log-metric correlation |
-| 76 | OTEL Collector, traces, alerting rules |
-| 77 | Full stack integration, unified dashboard |
+| Day | What You Built                                |
+| --- | --------------------------------------------- |
+| 73  | Prometheus, PromQL, metrics fundamentals      |
+| 74  | Node Exporter, cAdvisor, Grafana dashboards   |
+| 75  | Loki, Promtail, LogQL, log-metric correlation |
+| 76  | OTEL Collector, traces, alerting rules        |
+| 77  | Full stack integration, unified dashboard     |
 
 2. What would you add for production?
    - Alertmanager for routing alerts to Slack/PagerDuty
