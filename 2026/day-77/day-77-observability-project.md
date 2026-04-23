@@ -441,6 +441,10 @@ docker compose down -v
 
 The `-v` flag removes named volumes (Prometheus data, Grafana data, Loki data). Only use this if you are done exploring.
 
+## GIT REPO  ##
+
+**https://github.com/Manish12588/observability**
+
 ---
 
 ## Hints
