@@ -203,6 +203,8 @@ Write down: What is a kubeconfig? Where is it stored on your machine?
 - kind requires Docker to be running (it creates clusters using containers)
 - minikube can use Docker, VirtualBox, or other drivers
 - The default kubeconfig file is at `~/.kube/config`
+  apiVersion: v1
+  kind: config
 - `kubectl get pods -A` is short for `kubectl get pods --all-namespaces`
 - If `kubectl` cannot connect, check if your cluster is running: `kind get clusters` or `minikube status`
 - `-o wide` flag gives extra details: `kubectl get nodes -o wide`

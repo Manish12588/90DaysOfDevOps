@@ -1,7 +1,7 @@
 # Day 55 – Persistent Volumes (PV) and Persistent Volume Claims (PVC)
 
 ### Task 1: See the Problem — Data Lost on Pod Deletion
-1. Write a Pod manifest that uses an `emptyDir` volume and writes a timestamped message to `/data/message.txt`
+1. Write a Pod manifest that uses an ` ` volume and writes a timestamped message to `/data/message.txt`
    
    [pod-deletion.yml](./Manifest-files/pod-deletion.yml)
 

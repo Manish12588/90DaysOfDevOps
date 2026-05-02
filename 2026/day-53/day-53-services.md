@@ -161,8 +161,7 @@ exit
 
 Both the short name and the full DNS name resolve to the same ClusterIP. In practice, you use the short name when communicating within the same namespace and the full name when reaching across namespaces.
 
-**Verify:** What IP does `nslookup` return? Does it match the CLUSTER-IP from `kubectl get services`?
-
+**Verify:** What IP does `nslookup` return? Does it match the CLUSTER-IP from `kubectl get services`
 `nslookup`
 
 ![](Images/Task-3_Step-4.png)

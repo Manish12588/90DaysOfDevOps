@@ -199,6 +199,15 @@ kubectl label pod nginx-pod environment-
 
 Write a manifest for a third pod with at least 3 labels (app, environment, team). Apply it and practice filtering.
 
+**[redis-pod-with-labels](./yaml/redis-pod-with-labels.yml)**
+
+```bash
+kubectl apply -f redis-pod-with-labels.yml
+
+kubectl get pods -l app=redis
+kubectl get pods -l environment=dev
+kubectl get pods -l team= DevOps
+```
 ---
 
 ### Task 6: Clean Up
