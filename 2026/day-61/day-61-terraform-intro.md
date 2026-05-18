@@ -89,6 +89,19 @@ Create a file called `main.tf` with:
 
 [main.tf](./configuration-files/main.tf)
 
+```bash
+provider aws{
+region = "us-west-2"
+}
+
+resource "aws_s3_bucket" s3_bucket{
+bucket = "my-first-learing-bucket"
+}
+
+```
+
+
+
 Run the Terraform lifecycle:
 ```bash
 terraform init      # Download the AWS provider
